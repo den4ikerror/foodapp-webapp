@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#6B8F47" />
+<title>Тарілка — аналіз їжі</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== HOME ===== -->
+  <section id="view-home" class="view view--active">
+    <header class="topbar">
+      <span class="topbar__title">Тарілка</span>
+    </header>
+
+    <div class="home">
+      <p class="home__lead">Що ти з'їв(-ла)?</p>
+      <button class="cta" id="btn-go-analyze">
+        <span class="cta__icon">📷</span>
+        <span>Аналіз їжі</span>
+      </button>
+      <p class="home__hint">Фото, текст — або обидва разом</p>
+    </div>
+  </section>
+
+  <!-- ===== ANALYZE (вхід) ===== -->
+  <section id="view-analyze" class="view">
+    <header class="topbar">
+      <button class="iconbtn" id="btn-back-from-analyze">←</button>
+      <span class="topbar__title">Аналіз їжі</span>
+    </header>
+
+    <div class="analyze">
+      <div class="photo-box" id="photo-box">
+        <img id="photo-preview" class="photo-box__img" hidden />
+        <div class="photo-box__placeholder" id="photo-placeholder">
+          <span class="photo-box__icon">🍽</span>
+          <span>Додати фото</span>
+        </div>
+        <input type="file" id="photo-input" accept="image/*" capture="environment" hidden />
+      </div>
+      <button class="link-btn" id="btn-remove-photo" hidden>Прибрати фото</button>
+
+      <label class="field-label" for="text-input">Опис їжі (можна замість фото або на додачу)</label>
+      <textarea id="text-input" class="textfield" rows="3" placeholder="напр. великий бургер з картоплею фрі і кола 0,5л"></textarea>
+
+      <button class="cta cta--full" id="btn-submit-analysis">Проаналізувати</button>
+    </div>
+  </section>
+
+  <!-- ===== LOADING ===== -->
+  <section id="view-loading" class="view">
+    <div class="loading">
+      <div class="loading__spinner"></div>
+      <p id="loading-text">Аналізую…</p>
+    </div>
+  </section>
+
+  <!-- ===== RESULT ===== -->
+  <section id="view-result" class="view">
+    <header class="topbar">
+      <button class="iconbtn" id="btn-back-from-result">←</button>
+      <span class="topbar__title">Результат</span>
+    </header>
+
+    <div class="result">
+      <div class="receipt" id="receipt-card">
+        <!-- заповнюється з app.js -->
+      </div>
+      <button class="cta cta--full" id="btn-result-done">Готово</button>
+    </div>
+  </section>
+
+  <!-- ===== HISTORY ===== -->
+  <section id="view-history" class="view">
+    <header class="topbar">
+      <span class="topbar__title">Історія</span>
+    </header>
+    <div class="history" id="history-list">
+      <!-- заповнюється з app.js -->
+    </div>
+  </section>
+
+  <!-- ===== ENTRY DETAIL ===== -->
+  <section id="view-detail" class="view">
+    <header class="topbar">
+      <button class="iconbtn" id="btn-back-from-detail">←</button>
+      <span class="topbar__title">Запис</span>
+      <button class="iconbtn iconbtn--danger" id="btn-delete-entry">🗑</button>
+    </header>
+    <div class="result">
+      <div class="receipt" id="detail-card"></div>
+    </div>
+  </section>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <nav class="navbar" id="navbar">
+    <button class="navbar__item is-active" data-target="view-home">
+      <span>🍽</span><small>Аналіз</small>
+    </button>
+    <button class="navbar__item" data-target="view-history">
+      <span>📋</span><small>Історія</small>
+    </button>
+  </nav>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
