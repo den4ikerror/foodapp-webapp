@@ -1,6 +1,6 @@
 // ====== НАЛАШТУВАННЯ ======
 // Встав сюди адресу свого backend після деплою (без слеша в кінці)
-const API_URL = "https://ВАШ-BACKEND.onrender.com";
+const API_URL = "https://foodapp-backend.dengor354.workers.dev/";
 
 const STORAGE_KEY = "tarilka_entries_v1";
 
@@ -55,6 +55,31 @@ photoInput.addEventListener("change", () => {
     btnRemovePhoto.hidden = false;
   });
 });
+
+// Менша версія фото лише для показу в історії (щоб не забивати localStorage
+// повнорозмірними знімками — нам там потрібна лише мініатюра).
+function makeThumbnail(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxSize = 200;
+      let { width, height } = img;
+      if (width > height && width > maxSize) {
+        height = Math.round((height * maxSize) / width);
+        width = maxSize;
+      } else if (height > maxSize) {
+        width = Math.round((width * maxSize) / height);
+        height = maxSize;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", 0.6));
+    };
+    img.src = dataUrl;
+  });
+}
 
 // Стискаємо фото до розумного розміру (макс. сторона maxSize px), щоб не
 // відправляти 8+ МБ оригінал з камери телефону — модель цього не потребує,
@@ -127,19 +152,37 @@ document.getElementById("btn-submit-analysis").addEventListener("click", async (
     if (!res.ok) throw new Error("Server error " + res.status);
     const data = await res.json();
 
+    const thumb = currentPhotoBase64
+      ? await makeThumbnail(`data:image/jpeg;base64,${currentPhotoBase64}`)
+      : null;
+
     const entry = {
       id: Date.now(),
       date: new Date().toISOString(),
-      photo: currentPhotoBase64 ? `data:image/jpeg;base64,${currentPhotoBase64}` : null,
+      photo: thumb,
       ...data,
     };
-    saveEntry(entry);
+
+    try {
+      saveEntry(entry);
+    } catch (storageErr) {
+      console.error("Storage error:", storageErr);
+      // Якщо не вдалось зберегти (напр. localStorage переповнений) — все одно
+      // показуємо результат, лише без фото в історії, щоб звільнити місце.
+      try {
+        entry.photo = null;
+        saveEntry(entry);
+      } catch (e2) {
+        console.error("Storage error (retry without photo):", e2);
+      }
+    }
+
     renderReceipt(document.getElementById("receipt-card"), entry);
     showView("view-result");
   } catch (err) {
     console.error(err);
     showView("view-analyze");
-    alert("Не вдалося проаналізувати 😕 Перевір інтернет і спробуй ще раз.");
+    alert("Не вдалося проаналізувати 😕 Причина: " + err.message);
   }
 });
 
